@@ -7,6 +7,8 @@ package uw.tcss.TCSS_342.Week_01.src;
  */
 public class MySet implements Set {
 
+    private final static int DEFAULT_SIZE = 5;
+
     private Object[] fSet;
     private int fElementCount;
 
@@ -14,7 +16,7 @@ public class MySet implements Set {
      * Constructs a new set with default size of 5
      */
     public MySet() {
-        this(5);
+        this(DEFAULT_SIZE);
     }
 
     /**
@@ -33,8 +35,7 @@ public class MySet implements Set {
 
     @Override
     public void makeEmpty() {
-        final int lPreviousSize = this.fSet.length;
-        this.fSet = new Object[lPreviousSize];
+        this.fSet = new Object[DEFAULT_SIZE];
         this.fElementCount = 0;
     }
 
