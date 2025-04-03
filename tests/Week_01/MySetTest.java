@@ -99,6 +99,25 @@ public class MySetTest {
     }
 
     @Test
+    public void testResize() {
+        assertEquals(
+                0,
+                fSet.size(),
+                "set did not construct with size 0"
+        );
+
+        final int lNumberOfInsertions = 11;
+        for (int i = 0; i < lNumberOfInsertions; i++) {
+            fSet.insert(new Object());
+            assertEquals(
+                    i + 1,
+                    fSet.size(),
+                    "set did not increment when adding an item"
+            );
+        }
+    }
+
+    @Test
     public void testSize() {
         assertEquals(
                 0,
