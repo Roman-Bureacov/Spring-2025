@@ -1,4 +1,4 @@
-package Week_01;
+package uw.tcss.TCSS_342.Week_01;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
