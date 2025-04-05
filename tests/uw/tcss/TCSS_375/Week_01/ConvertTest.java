@@ -10,8 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import code.Convert;
-
 /**
  * Unit tests of the methods in the Convert class.
  * 
@@ -23,7 +21,7 @@ class ConvertTest {
     // Binary to Decimal Tests
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompPositive0with1Bit() {
@@ -32,7 +30,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompPositive0with16Bits() {
@@ -42,7 +40,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompPositive1() {
@@ -51,7 +49,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompNegative1with1bit() {
@@ -60,7 +58,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompNegative1with16Bits() {
@@ -70,7 +68,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompMaxPos16BitValue() {
@@ -80,7 +78,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompMinNeg16BitValue() {
@@ -90,7 +88,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompDoesNotChangePosParmaeter() {
@@ -103,7 +101,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompDoesNotChangeNegParmaeter() {
@@ -115,7 +113,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompIllegalPos17BitValue() {
@@ -128,7 +126,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convert2sCompToDecimal(char[])}.
+     * Test method for {@link Convert#convert2sCompToDecimal(char[])}.
      */
     @Test
     public void test2sCompMinIllegalNeg17BitValue() {
@@ -149,7 +147,7 @@ class ConvertTest {
     // Decimal to Binary
     
     /**
-     * Test method for {@link code.Convert#convertDecimalTo2sComp(int)}.
+     * Test method for {@link Convert#convertDecimalTo2sComp(int)}.
      */
     @Test
     void testConvertDecimalTo2sCompZero() {
@@ -161,7 +159,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convertDecimalTo2sComp(int)}.
+     * Test method for {@link Convert#convertDecimalTo2sComp(int)}.
      */
     @Test
     void testConvertDecimalTo2sCompPositive1() {
@@ -173,7 +171,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convertDecimalTo2sComp(int)}.
+     * Test method for {@link Convert#convertDecimalTo2sComp(int)}.
      */
     @Test
     void testConvertDecimalTo2sCompPositiveMAX() {
@@ -185,7 +183,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convertDecimalTo2sComp(int)}.
+     * Test method for {@link Convert#convertDecimalTo2sComp(int)}.
      */
     @Test
     void testConvertDecimalTo2sCompNegative1() {
@@ -197,7 +195,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convertDecimalTo2sComp(int)}.
+     * Test method for {@link Convert#convertDecimalTo2sComp(int)}.
      */
     @Test
     void testConvertDecimalTo2sCompNegativeMAX() {
@@ -209,7 +207,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convertDecimalTo2sComp(int)}.
+     * Test method for {@link Convert#convertDecimalTo2sComp(int)}.
      */
     @Test
     void testConvertDecimalTo2sCompIllegalPositiveMAX() {
@@ -220,7 +218,7 @@ class ConvertTest {
     }
     
     /**
-     * Test method for {@link code.Convert#convertDecimalTo2sComp(int)}.
+     * Test method for {@link Convert#convertDecimalTo2sComp(int)}.
      */
     @Test
     void testConvertDecimalTo2sCompIllegalNegativeMAX() {
