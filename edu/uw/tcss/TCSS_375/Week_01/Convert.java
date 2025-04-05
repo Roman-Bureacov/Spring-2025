@@ -139,6 +139,8 @@ public final class Convert {
         final int lBitsLength = pBits.length;
         final char[] lBitsCopy = new char[lBitsLength];
         if (isNegative(pBits)) {
+            // method to find 2s complement as described in
+            // textbook section 2.3, example 2.1
             // invert all bits
             for (int i = 0; i < lBitsLength; i++) {
                 lBitsCopy[i] = flipBit(pBits[i]);
