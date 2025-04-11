@@ -40,7 +40,7 @@ final class Personal_BitAdder {
         final boolean lAnd100 = pBitA && !pBitB && !pBitCarry;
         // final boolean lAnd000 = !pBitA && !pBitB && !pBitCarry;
         
-        // connect the lAnd gates to the or gates
+        // connect the and gates to the or gates
         final boolean lBitSum = lAnd111 || lAnd100 || lAnd010 || lAnd001;
         final boolean lBitCarry = lAnd111 || lAnd110 || lAnd101 || lAnd011;
                 
