@@ -15,8 +15,8 @@ final class Personal_BitAdder {
 
     public static void main(final String... pArgs) {
         final byte lSize = 32;
-        
-        final boolean[] lBitsA = {true, false, false, true, true};
+        // TODO: fix this behavior
+        final boolean[] lBitsA = {true, true, false, true};
         final boolean[] lBitsB = {false, true, true, true};
         
         // add the two bit arrays
