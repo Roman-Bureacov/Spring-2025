@@ -9,6 +9,10 @@ package uw.tcss.TCSS_375.Week_02;
  */
 final class Personal_BitAdder {
 
+    private Personal_BitAdder() {
+        super();
+    }
+
     public static void main(final String... pArgs) {
         final byte lSize = 32;
         
