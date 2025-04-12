@@ -1,5 +1,7 @@
 package uw.tcss.TCSS_375.Week_02;
 
+import java.util.Scanner;
+
 /**
  * The idea of this program is to implement the half-adder as shown in 
  * "introduction to computing systems" Page 71 (100/801)
@@ -9,16 +11,29 @@ package uw.tcss.TCSS_375.Week_02;
  */
 final class Personal_BitAdder {
 
+    private static final char ONE = '1';
+
     private Personal_BitAdder() {
         super();
     }
 
     public static void main(final String... pArgs) {
-        final byte lSize = 32;
-        // TODO: fix this behavior
-        final boolean[] lBitsA = {true, true, false, true};
-        final boolean[] lBitsB = {false, true, true, true};
-        
+        final Scanner lInput = new Scanner(System.in);
+
+        System.out.print("Input bit string A: ");
+        final String lBitStringA = lInput.next();
+
+        System.out.print("Input bit string B: ");
+        final String lBitStringB = lInput.next();
+
+        System.out.print("Final bit string size (1 - 32): ");
+        final byte lSize = lInput.nextByte();
+
+        System.out.println();
+
+        final boolean[] lBitsA = bitStringToBooleanArray(lBitStringA);
+        final boolean[] lBitsB = bitStringToBooleanArray(lBitStringB);
+
         // add the two bit arrays
         final boolean[] lBitsC = sumBits(lBitsA, lBitsB, lSize);
 
@@ -61,12 +76,27 @@ final class Personal_BitAdder {
             boolean lCarry = lFirstSum.carry();
 
             for (int lBitsAIndex = lBitsAEnd - 1, lBitsBIndex = lBitsBEnd - 1, lBitsCIndex = lBitsCEnd - 1;
-                 lBitsAIndex >= 0 && lBitsBIndex >= 0 && lBitsCIndex >= 0;
+                 lBitsCIndex >= 0;
                  lBitsAIndex--, lBitsBIndex--, lBitsCIndex--) {
 
-                final addResult lSumResult = add(pBitsA[lBitsAIndex], pBitsB[lBitsBIndex], lCarry);
-                lBitsC[lBitsCIndex] = lSumResult.sum();
-                lCarry = lSumResult.carry();
+                if (lBitsAIndex >= 0 && lBitsBIndex >= 0) {
+                    final addResult lSumResult = add(pBitsA[lBitsAIndex], pBitsB[lBitsBIndex], lCarry);
+                    lBitsC[lBitsCIndex] = lSumResult.sum();
+                    lCarry = lSumResult.carry();
+                } else {
+                    if (lBitsAIndex >= 0) {
+                        final addResult lSumResult = add(pBitsA[lBitsAIndex], false, lCarry);
+                        lBitsC[lBitsCIndex] = lSumResult.sum();
+                        lCarry = lSumResult.carry();
+                    } else if (lBitsBIndex >= 0) {
+                        final addResult lSumResult = add(pBitsB[lBitsBIndex], false, lCarry);
+                        lBitsC[lBitsCIndex] = lSumResult.sum();
+                        lCarry = lSumResult.carry();
+                    } else {
+                        lBitsC[lBitsCIndex] = lCarry;
+                        break;
+                    }
+                }
             }
         }
 
@@ -82,7 +112,17 @@ final class Personal_BitAdder {
         for (final boolean pBit : pBits) lBuilder.append(asInteger(pBit));
         return lBuilder.toString();
     }
-    
+
+    private static boolean[] bitStringToBooleanArray(final String pBitString) {
+        final boolean[] lBits = new boolean[pBitString.length()];
+        for (int i = 0; i < pBitString.length(); i++) lBits[i] = isOne(pBitString.charAt(i));
+        return lBits;
+    }
+
+    private static boolean isOne(final char pChar) {
+        return pChar == ONE;
+    }
+
     private record addResult(boolean sum, boolean carry) {}
 }
 
