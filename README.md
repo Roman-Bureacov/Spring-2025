@@ -1,5 +1,5 @@
-# Winter-2025
-Repository for code written for UWT Winter 2025 classes
+# Spring-2025
+Repository for code written for UWT Spring 2025 classes
 
 If you stumble across this trying to look for code for your own classes, 
 I implore you to try to think about your code first before attempting to look for solutions.
