@@ -118,7 +118,7 @@ public final class Polynomial {
     /**
      * Return a string representation of the object.
      *
-     * @deprecated use toString instead
+     * @deprecated use identical toString instead
      * @return string representation of the object
      */
     @Deprecated
@@ -128,6 +128,54 @@ public final class Polynomial {
 
     @Override
     public String toString() {
-        return null;
+        final StringBuilder lPolynomialString = new StringBuilder();
+        final Iterator lIterator = this.iTerms.iterator();
+
+        if (lIterator.hasNext()) {
+            // insert first element
+            final Literal lFirstLiteral = (Literal)((ListNode)lIterator.next()).getElement();
+            lPolynomialString.append(termToString(lFirstLiteral));
+
+            while (lIterator.hasNext()) {
+                final ListNode lNode = (ListNode) lIterator.next();
+                final Literal lLiteral = (Literal) lNode.getElement();
+
+                lPolynomialString.append(
+                        " + %s".formatted(termToString(lLiteral))
+                );
+            }
+        }
+
+        return lPolynomialString.toString();
+    }
+
+    /**
+     * Converts the term provided into a string representation
+     * @param pTerm the term to turn into a string
+     * @return the string representation of the term
+     */
+    private static String termToString(final Literal pTerm) {
+        final String lPositiveExp = "%dx^%d";
+        final String lNegativeExp = "%dx^(%d)";
+        final String lOneExp = "%dx";
+        final String lZeroExp = "%d";
+
+        final String lTermString;
+        final int lTermExponent = pTerm.getExponent();
+
+        if (lTermExponent > 1) {
+            lTermString = lPositiveExp.formatted(pTerm.getCoefficient(), lTermExponent);
+        } else if (lTermExponent < 0) {
+            lTermString = lNegativeExp.formatted(pTerm.getCoefficient(), lTermExponent);
+        } else {
+            // if the exponent is one or zero
+            if (lTermExponent == 1) {
+                lTermString = lOneExp.formatted(pTerm.getCoefficient());
+            } else {
+                lTermString = lZeroExp.formatted(pTerm.getCoefficient());
+            }
+        }
+
+        return lTermString;
     }
 }
