@@ -25,6 +25,9 @@ public final class Polynomial {
      * @param pExponent the exponent of the term to be inserted
      */
     public void insertTerm(final int pCoefficient, final int pExponent) {
+        // zero check
+        if (pExponent == 0 || pCoefficient == 0) return;
+
         // is the list is empty...
         if (this.iTerms.isEmpty()) {
             this.iTerms.insert(
@@ -35,6 +38,7 @@ public final class Polynomial {
             // check if the insertion needs to happen at the beginning of the list
             final ListNode lFirstNode = (ListNode)(this.iTerms.iterator().next());
             final int lFirstExponent = ((Literal)(lFirstNode.getElement())).getExponent();
+
             if (pExponent > lFirstExponent) {
 
                 this.iTerms.insert(
@@ -85,7 +89,7 @@ public final class Polynomial {
     }
 
     public void zeroPolynomial() {
-        return null;
+        this.iTerms.makeEmpty();
     }
 
     public Polynomial negate() {
@@ -144,6 +148,9 @@ public final class Polynomial {
                         " + %s".formatted(termToString(lLiteral))
                 );
             }
+        } else {
+            // polynomial is empty
+            lPolynomialString.append(0);
         }
 
         return lPolynomialString.toString();
