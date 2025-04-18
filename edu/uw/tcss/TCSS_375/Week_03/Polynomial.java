@@ -95,8 +95,22 @@ public final class Polynomial {
     }
 
     public Polynomial negate() {
-        this.iTerms.
-        return null;
+        final Iterator lIterator = this.iTerms.iterator();
+        final Polynomial lNegativePoly = new Polynomial();
+
+        // reconstruct the polynomial with negative terms in O(n) time
+        // using method insert would lead to O(n^2) time
+        ListNode lWorkingNode = lNegativePoly.iTerms.zeroth().getNode();
+        while (lIterator.hasNext()) {
+            final Literal lLiteral = (Literal) ((ListNode) lIterator.next()).getElement();
+            final Literal lNegativeLiteral =
+                    new Literal(-1 * lLiteral.getCoefficient(), lLiteral.getExponent());
+
+            lWorkingNode.setNext(new ListNode(lNegativeLiteral));
+            lWorkingNode = lWorkingNode.getNext(); // advance
+        }
+        
+        return lNegativePoly;
     }
 
     public Polynomial plus(final Polynomial pPolynomial) {
@@ -139,7 +153,7 @@ public final class Polynomial {
 
         if (lIterator.hasNext()) {
             // insert first element
-            final Literal lFirstLiteral = (Literal)((ListNode)lIterator.next()).getElement();
+            final Literal lFirstLiteral = toLiteral((ListNode)lIterator.next());
             lPolynomialString.append(termToString(lFirstLiteral));
 
             while (lIterator.hasNext()) {
@@ -186,5 +200,12 @@ public final class Polynomial {
         }
 
         return lTermString;
+    }
+
+    /**
+     * castNode as Literal
+     */
+    private static Literal toLiteral(final ListNode pNode) {
+        return (Literal) pNode.getElement();
     }
 }
