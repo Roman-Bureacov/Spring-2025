@@ -21,12 +21,14 @@ public final class Polynomial {
      * Insert a term into the polynomial. Insertion will occur at the respective position.
      * <br>
      * For example, insertion of 3x^2 into 2x^3 + 1 will produce 2x^3 + 3x^2 + 1
+     * <br>
+     * This method will ignore zero terms
      * @param pCoefficient the coefficient of the term to be inserted
      * @param pExponent the exponent of the term to be inserted
      */
     public void insertTerm(final int pCoefficient, final int pExponent) {
         // zero check
-        if (pExponent == 0 || pCoefficient == 0) return;
+        if (pCoefficient == 0) return;
 
         // is the list is empty...
         if (this.iTerms.isEmpty()) {
