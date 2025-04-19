@@ -114,9 +114,9 @@ public final class Polynomial {
     }
 
     /**
-     *
-     * @param pPolynomial
-     * @return
+     * Adds this the other polynomial to this polynomial.
+     * @param pPolynomial the polynomial to add onto this polynomial
+     * @return the resulting sum of the two polynomials
      */
     public Polynomial plus(final Polynomial pPolynomial) {
         final Iterator lThisIter = this.iTerms.iterator();
@@ -171,6 +171,7 @@ public final class Polynomial {
     }
 
     public Polynomial derivative() {
+        
         return null;
     }
 
