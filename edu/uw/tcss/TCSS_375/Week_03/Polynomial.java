@@ -170,9 +170,30 @@ public final class Polynomial {
         return null;
     }
 
+    /**
+     * The derivative of this polynomial.
+     * @return the derivative of this polynomial
+     */
     public Polynomial derivative() {
-        
-        return null;
+        final Iterator lThisIter = this.iTerms.iterator();
+        final Polynomial lDerivative = new Polynomial();
+        final Iterator lDerivIter = lDerivative.iTerms.zeroth();
+
+
+        while (lThisIter.hasNext()) {
+            final Literal lOldLiteral = listNodeToLiteral((ListNode) lThisIter.next());
+
+            final int lDerivCoeff = lOldLiteral.getCoefficient() * lOldLiteral.getExponent();
+            final int lDerivExp = lOldLiteral.getExponent() - 1;
+
+            if (lDerivCoeff != 0) {
+                final ListNode lNewNode = literalToListNode(lDerivCoeff, lDerivExp);
+                lDerivative.iTerms.insert(lNewNode, (LinkedList.Iterator) lDerivIter);
+                lDerivIter.next();
+            }
+        }
+
+        return lDerivative;
     }
 
     /**
@@ -256,7 +277,7 @@ public final class Polynomial {
                                               final int pExponent) {
 
         final Literal lNewLiteral = new Literal(pCoefficient, pExponent);
-        return new ListNode(lNewLiteral, null)
+        return new ListNode(lNewLiteral, null);
     }
 
     /**
