@@ -38,6 +38,7 @@ public final class Polynomial {
             );
         } else {
             // check if the insertion needs to happen at the beginning of the list
+            // TODO: iterator.next returns Literal, not ListNode
             final ListNode lFirstNode = (ListNode)(this.iTerms.iterator().next());
             final int lFirstExponent = ((Literal)(lFirstNode.getElement())).getExponent();
 
@@ -53,6 +54,7 @@ public final class Polynomial {
             final Iterator lIterator = this.iTerms.iterator();
 
             while (lIterator.hasNext()) {
+                // TODO: iterator.next returns Literal, not ListNode
                 final ListNode lNode = (ListNode) lIterator.next();
                 final Literal lTerm = (Literal) lNode.getElement();
 
@@ -102,6 +104,7 @@ public final class Polynomial {
         // using method insert would lead to O(n^2) time
         ListNode lWorkingNode = lNegativePoly.iTerms.zeroth().getNode();
         while (lIterator.hasNext()) {
+            // TODO: iterator.next returns Literal, not ListNode
             final Literal lLiteral = (Literal) ((ListNode) lIterator.next()).getElement();
             final Literal lNegativeLiteral =
                     new Literal(-1 * lLiteral.getCoefficient(), lLiteral.getExponent());
@@ -125,6 +128,7 @@ public final class Polynomial {
         final Polynomial lSum = new Polynomial();
         ListNode lSumNode = lSum.iTerms.zeroth().getNode();
 
+        // TODO: iterator.next returns Literal, not ListNode
         final ListNode lThisNode = (ListNode) lThisIter.next();
         final ListNode lOtherNode = (ListNode) lOtherIter.next();
 
@@ -214,7 +218,7 @@ public final class Polynomial {
 
         if (lIterator.hasNext()) {
             // insert first element
-            final Literal lFirstLiteral = listNodeToLiteral((ListNode)lIterator.next());
+            final Literal lFirstLiteral = (Literal)lIterator.next();
             lPolynomialString.append(termToString(lFirstLiteral));
 
             while (lIterator.hasNext()) {
@@ -242,16 +246,30 @@ public final class Polynomial {
         final String lTermString;
         final int lTermExponent = pTerm.getExponent();
 
-        if (lTermExponent > 1) {
-            lTermString = "%dx^%d".formatted(pTerm.getCoefficient(), lTermExponent);
-        } else if (lTermExponent < 0) {
-            lTermString = "%dx^(%d)".formatted(pTerm.getCoefficient(), lTermExponent);
-        } else {
-            // if the exponent is one or zero
-            if (lTermExponent == 1) {
-                lTermString = "%dx".formatted(pTerm.getCoefficient());
+        if (pTerm.getCoefficient() == 1) {
+            if (lTermExponent > 1) {
+                lTermString = "x^%d".formatted(lTermExponent);
+            } else if (lTermExponent < 0) {
+                lTermString = "x^(%d)".formatted(lTermExponent);
             } else {
-                lTermString = "%d".formatted(pTerm.getCoefficient());
+                if (lTermExponent == 1) {
+                    lTermString = "x";
+                } else {
+                    lTermString = "1";
+                }
+            }
+        } else {
+            if (lTermExponent > 1) {
+                lTermString = "%dx^%d".formatted(pTerm.getCoefficient(), lTermExponent);
+            } else if (lTermExponent < 0) {
+                lTermString = "%dx^(%d)".formatted(pTerm.getCoefficient(), lTermExponent);
+            } else {
+                // if the exponent is one or zero
+                if (lTermExponent == 1) {
+                    lTermString = "%dx".formatted(pTerm.getCoefficient());
+                } else {
+                    lTermString = "%d".formatted(pTerm.getCoefficient());
+                }
             }
         }
 
@@ -302,4 +320,8 @@ public final class Polynomial {
             pInto.setNext(literalToListNode(lFromLiteral.getCoefficient(), lFromLiteral.getExponent()));
         }
     }
+
+    /**
+     * Get the correct string for
+     */
 }
