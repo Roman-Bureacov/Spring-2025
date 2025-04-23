@@ -196,9 +196,21 @@ public final class Polynomial {
         return this.plus(pPolynomial.negate());
     }
 
-    // bonus method
-    public Polynomial times(Polynomial pPolynomial) {
-        return null;
+    /**
+     * multiplies this polynomial by the other
+     * @param pPolynomial the polynomial to multiply with
+     * @return this polynomial times the other
+     */
+    public Polynomial times(final Polynomial pPolynomial) {
+        Polynomial lProduct = new Polynomial();
+        final Iterator lThisIter = this.iTerms.iterator();
+
+        while (lThisIter.hasNext()) {
+            final Polynomial lSubProd = multiplyTerm((Literal) lThisIter.next(), pPolynomial);
+            lProduct = lProduct.plus(lSubProd);
+        }
+
+        return lProduct;
     }
 
     /**
@@ -268,6 +280,32 @@ public final class Polynomial {
         return lPolynomialString.toString();
     }
 
+    /* --- HELPERS --- */
+
+    /**
+     * Multiplies the term into the polynomial
+     * @param pTerm the term to multiply
+     * @param pPoly the polynomial to affect
+     * @return the product of the term and the polynomial
+     */
+    private static Polynomial multiplyTerm(final Literal pTerm, final Polynomial pPoly) {
+        final Polynomial lProduct = new Polynomial();
+        final Iterator lProductIter = lProduct.iTerms.zeroth();
+
+        pPoly.iTerms.iterator().forEachRemaining(
+                term -> {
+                    final Literal lPolyTerm = (Literal) term;
+                    final int lNewCoefficient = lPolyTerm.getCoefficient() * pTerm.getCoefficient();
+                    final int lNewExponent = lPolyTerm.getExponent() + pTerm.getExponent();
+                    final Literal lNewLiteral = new Literal(lNewCoefficient, lNewExponent);
+                    lProduct.iTerms.insert(lNewLiteral, lProductIter);
+                    lProductIter.next();
+                }
+        );
+
+        return lProduct;
+    }
+
     /**
      * Converts the term provided into a string representation. Note that this method is a helper method for
      * the toString and will strip out the negative sign.
@@ -325,7 +363,7 @@ public final class Polynomial {
     /**
      * Requests the next element, null if there are no more elements.
      * @param pIter the iterator to request from
-     * @return next literal if availablem null otherwise
+     * @return next literal if available, null otherwise
      */
     private static Literal requestNext(final Iterator pIter) {
         if (pIter.hasNext()) return (Literal) pIter.next();
