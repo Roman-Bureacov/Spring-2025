@@ -95,10 +95,17 @@ public final class Polynomial {
         }
     }
 
+    /**
+     * Sets this polynomial equal to zero.
+     */
     public void zeroPolynomial() {
         this.iTerms.makeEmpty();
     }
 
+    /**
+     * Negates this polynomial.
+     * @return the negation of this polynomial
+     */
     public Polynomial negate() {
         final Iterator lThisIter = this.iTerms.iterator();
         final Polynomial lNegativePoly = new Polynomial();
@@ -138,16 +145,11 @@ public final class Polynomial {
             Literal lThisLiteral = (Literal) lThisIter.next();
             Literal lOtherLiteral = (Literal) lOtherIter.next();
 
-            boolean lAdvanceThis = false;
-            boolean lAdvanceOther = false;
-            while (lThisIter.hasNext() && lOtherIter.hasNext()) {
-                if (lAdvanceThis) lThisLiteral = (Literal) lThisIter.next();
-                if (lAdvanceOther) lOtherLiteral = (Literal) lOtherIter.next();
+            // while we have yet to evaluate all elements
+            while (lThisLiteral != null && lOtherLiteral != null) {
 
                 final int lThisLiteralExp = lThisLiteral.getExponent();
                 final int lOtherLiteralExp = lOtherLiteral.getExponent();
-                lAdvanceThis = false;
-                lAdvanceOther = false;
 
                 if (lThisLiteralExp == lOtherLiteralExp) {
                     final int lNewCoefficient = lThisLiteral.getCoefficient() + lOtherLiteral.getCoefficient();
@@ -156,19 +158,29 @@ public final class Polynomial {
                         lSum.iTerms.insert(lNewLiteral, lSumIter);
                         lSumIter.next();
                     }
-                    lAdvanceThis = true;
-                    lAdvanceOther = true;
+                    lThisLiteral = requestNext(lThisIter);
+                    lOtherLiteral = requestNext(lOtherIter);
                 } else if (lThisLiteralExp > lOtherLiteralExp) {
                     lSum.iTerms.insert(lThisLiteral, lSumIter);
-                    lAdvanceThis = true;
+                    lThisLiteral = requestNext(lThisIter);
                     lSumIter.next();
                 } else { // thisExp < otherExp
                     lSum.iTerms.insert(lOtherLiteral, lSumIter);
-                    lAdvanceOther = true;
+                    lOtherLiteral = requestNext(lOtherIter);
                     lSumIter.next();
                 }
             }
+
+            if (lThisLiteral != null) {
+                lSum.iTerms.insert(lThisLiteral, lSumIter);
+                lSumIter.next();
+            } else if (lOtherLiteral != null) {
+                lSum.iTerms.insert(lOtherLiteral, lSumIter);
+                lSumIter.next();
+            }
         }
+
+        // appends remaining terms, if any
         if (lThisIter.hasNext()) insertRemainingSum(lSum, lSumIter, lThisIter);
         else if (lOtherIter.hasNext()) insertRemainingSum(lSum, lSumIter, lOtherIter);
 
@@ -308,6 +320,16 @@ public final class Polynomial {
             pInto.iTerms.insert(lFromLiteral, pIntoIter);
             pIntoIter.next();
         }
+    }
+
+    /**
+     * Requests the next element, null if there are no more elements.
+     * @param pIter the iterator to request from
+     * @return next literal if availablem null otherwise
+     */
+    private static Literal requestNext(final Iterator pIter) {
+        if (pIter.hasNext()) return (Literal) pIter.next();
+        else return null;
     }
 
     /**
