@@ -9,12 +9,12 @@ import java.util.Iterator;
  * @version 2025-04-16
  */
 public final class Polynomial {
-    private final LinkedList iTerms;
+    private final ModifiedLinkedList iTerms;
 
     // Constructors
     public Polynomial() {
         super();
-        this.iTerms = new LinkedList();
+        this.iTerms = new ModifiedLinkedList();
     }
 
     /**
@@ -37,57 +37,60 @@ public final class Polynomial {
                     this.iTerms.zeroth()
             );
         } else {
+            final Literal lNewLiteral;
+
             // check if the insertion needs to happen at the beginning of the list
-            // TODO: iterator.next returns Literal, not ListNode
-            final ListNode lFirstNode = (ListNode)(this.iTerms.iterator().next());
-            final int lFirstExponent = ((Literal)(lFirstNode.getElement())).getExponent();
+            final Literal lFirstTerm = (Literal)(this.iTerms.iterator().next());
+            final int lFirstExponent = lFirstTerm.getExponent();
 
             if (pExponent > lFirstExponent) {
-
-                this.iTerms.insert(
-                        new ListNode(new Literal(pCoefficient, pExponent)),
-                        this.iTerms.zeroth()
+                lNewLiteral = new Literal(pCoefficient, pExponent);
+                this.iTerms.insert(lNewLiteral, this.iTerms.zeroth());
+            } else if (pExponent == lFirstExponent) {
+                lNewLiteral = new Literal(
+                        pCoefficient + lFirstTerm.getCoefficient(),
+                        pExponent
                 );
-            }
+                this.iTerms.remove(this.iTerms.zeroth());
+                this.iTerms.insert(lNewLiteral, this.iTerms.zeroth());
+            } else {
+                // otherwise insertion or modification needs to happen in the middle or at the end
+                final Iterator lTestIterator = this.iTerms.iterator();
+                lTestIterator.next();
+                if (!lTestIterator.hasNext()) { // edge case, only one node in list
+                    this.iTerms.insert(new Literal(pCoefficient, pExponent), this.iTerms.iterator());
+                } else { // this algorithm only works when the list contains at least two nodes
+                    final Iterator lIterCurrent = this.iTerms.zeroth();
+                    final Iterator lIterAhead = this.iTerms.iterator();
+                    int lPreviousExp = ((Literal) lIterAhead.next()).getExponent();
 
-            // otherwise insertion or modification needs to happen in the middle or at the end
-            final Iterator lIterator = this.iTerms.iterator();
+                    while (lIterAhead.hasNext()) {
+                        lIterCurrent.next();
+                        final Literal lCurrentLiteral = (Literal) lIterAhead.next();
 
-            while (lIterator.hasNext()) {
-                // TODO: iterator.next returns Literal, not ListNode
-                final ListNode lNode = (ListNode) lIterator.next();
-                final Literal lTerm = (Literal) lNode.getElement();
+                        final int lNewCoefficient;
 
-                final int lNewCoefficient;
-                final Literal lNewLiteral;
-
-                if (lTerm.getExponent() == pExponent) {
-                    lNewCoefficient = lTerm.getCoefficient() + pCoefficient;
-                    lNewLiteral = new Literal(lNewCoefficient, pExponent);
-                    lNode.setElement(lNewLiteral);
-                    return;
-                } else {
-                    if (lNode.getNext() != null) { // peek ahead
-                        final ListNode lNodeAhead = lNode.getNext();
-                        final Literal lTermAhead = (Literal) lNodeAhead.getElement();
-
-                        // we already checked for term greater than (the first node)
-                        // we already check for the term equal to
-                        // the node we are at has an exponent strictly greater than pExponent
-                        if (pExponent > lTermAhead.getExponent()) {
-                            lNewLiteral = new Literal(pCoefficient, pExponent);
-                            // method uses concrete class "Iterator" instead of interface "Iterator"
-                            this.iTerms.insert(new ListNode(lNewLiteral), (LinkedList.Iterator) lIterator);
+                        if (pExponent == lCurrentLiteral.getExponent()) {
+                            this.iTerms.remove(lIterCurrent);
+                            lNewCoefficient = lCurrentLiteral.getCoefficient() + pCoefficient;
+                            if (lNewCoefficient != 0) {
+                                lNewLiteral = new Literal(lNewCoefficient, pExponent);
+                                this.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lIterCurrent);
+                            }
                             return;
+                        } else {
+                            if (lPreviousExp > pExponent && pExponent > lCurrentLiteral.getExponent()) {
+                                lNewLiteral = new Literal(pCoefficient, pExponent);
+                                this.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lIterCurrent);
+                                return;
+                            }
+                            lPreviousExp = lCurrentLiteral.getExponent();
                         }
-
-                    } else { // last node remaining
-                        lNewLiteral = new Literal(pCoefficient, pExponent);
-                        // method uses concrete class "Iterator" instead of interface "Iterator"
-                        this.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lIterator);
                     }
+                    // failed to insert term before and now at last term
+                    lIterCurrent.next(); // advance iterator into position
+                    this.iTerms.insert(new Literal(pCoefficient, pExponent), (LinkedList.Iterator) lIterCurrent);
                 }
-
             }
         }
     }
@@ -97,22 +100,24 @@ public final class Polynomial {
     }
 
     public Polynomial negate() {
-        final Iterator lIterator = this.iTerms.iterator();
+        final Iterator lThisIter = this.iTerms.iterator();
         final Polynomial lNegativePoly = new Polynomial();
+        final Iterator lOtherIter = lNegativePoly.iTerms.zeroth();
 
         // reconstruct the polynomial with negative terms in O(n) time
         // using method insert would lead to O(n^2) time
-        ListNode lWorkingNode = lNegativePoly.iTerms.zeroth().getNode();
-        while (lIterator.hasNext()) {
-            // TODO: iterator.next returns Literal, not ListNode
-            final Literal lLiteral = (Literal) ((ListNode) lIterator.next()).getElement();
-            final Literal lNegativeLiteral =
-                    new Literal(-1 * lLiteral.getCoefficient(), lLiteral.getExponent());
+        while (lThisIter.hasNext()) {
+            final Literal lWorkingLiteral = (Literal) lThisIter.next();
+            final Literal lNewLiteral = new Literal(
+                    -1 * lWorkingLiteral.getCoefficient(),
+                    lWorkingLiteral.getExponent()
+            );
 
-            lWorkingNode.setNext(new ListNode(lNegativeLiteral));
-            lWorkingNode = lWorkingNode.getNext(); // advance
+            lNegativePoly.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lOtherIter);
+
+            lOtherIter.next();
         }
-        
+
         return lNegativePoly;
     }
 
@@ -126,36 +131,60 @@ public final class Polynomial {
         final Iterator lOtherIter = this.iTerms.iterator();
 
         final Polynomial lSum = new Polynomial();
-        ListNode lSumNode = lSum.iTerms.zeroth().getNode();
-
-        // TODO: iterator.next returns Literal, not ListNode
-        final ListNode lThisNode = (ListNode) lThisIter.next();
-        final ListNode lOtherNode = (ListNode) lOtherIter.next();
+        final Iterator lSumIter = lSum.iTerms.zeroth();
 
         // add terms
-        while (lThisIter.hasNext() && lOtherIter.hasNext()) {
-            final Literal lThisLiteral = listNodeToLiteral(lThisNode);
-            final Literal lOtherLiteral = listNodeToLiteral(lOtherNode);
+        if (lThisIter.hasNext() && lOtherIter.hasNext()) {
+            Literal lThisLiteral = (Literal) lThisIter.next();
+            Literal lOtherLiteral = (Literal) lOtherIter.next();
+
+            while (lThisIter.hasNext() && lOtherIter.hasNext()) {
+                final int lThisExp = lThisLiteral.getExponent();
+                final int lOtherExp = lOtherLiteral.getExponent();
+
+                if (lThisExp == lOtherExp) {
+                    final int lNewCoefficient = lThisLiteral.getCoefficient() + lOtherLiteral.getCoefficient();
+                    if (lNewCoefficient != 0) {
+                        lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp), (LinkedList.Iterator) lSumIter);
+                    }
+                    lThisLiteral = (Literal) lThisIter.next();
+                    lOtherLiteral = (Literal) lOtherIter.next();
+                } else if (lThisExp > lOtherExp) {
+                    final Literal lNewLiteral = new Literal(lThisLiteral.getCoefficient(), lThisExp);
+                    lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
+                    lThisLiteral = (Literal) lThisIter.next();
+                } else { // lThisExp < lOtherExp
+                    final Literal lNewLiteral = new Literal(lOtherLiteral.getCoefficient(), lOtherExp);
+                    lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
+                    lOtherLiteral = (Literal) lOtherIter.next();
+                }
+
+                lSumIter.next();
+            }
+
+            // final comparison
+            // the final two terms have one or both with no hasNext, thus the loop breaks early
             final int lThisExp = lThisLiteral.getExponent();
             final int lOtherExp = lOtherLiteral.getExponent();
 
             if (lThisExp == lOtherExp) {
-                final int lNewCoefficient =
-                        listNodeToLiteral(lThisNode).getCoefficient()
-                        + listNodeToLiteral(lOtherNode).getCoefficient();
+                final int lNewCoefficient = lThisLiteral.getCoefficient() + lOtherLiteral.getCoefficient();
                 if (lNewCoefficient != 0) {
-                    lSumNode.setNext(literalToListNode(lNewCoefficient, lThisExp));
+                    lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp), (LinkedList.Iterator) lSumIter);
                 }
             } else if (lThisExp > lOtherExp) {
-                lSumNode.setNext(literalToListNode(lThisExp, lThisLiteral.getExponent()));
-                lThisIter.next();
+                final Literal lNewLiteral = new Literal(lThisLiteral.getCoefficient(), lThisExp);
+                lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
             } else { // lThisExp < lOtherExp
-                lSumNode.setNext(literalToListNode(lOtherExp, lOtherLiteral.getExponent()));
+                final Literal lNewLiteral = new Literal(lOtherLiteral.getCoefficient(), lOtherExp);
+                lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
             }
+
+            lSumIter.next();
         }
         // insert the rest of the terms
-        if (lThisIter.hasNext()) insertRemaining(lThisIter, lSumNode);
-        else if (lOtherIter.hasNext()) insertRemaining(lOtherIter, lSumNode);
+        if (lThisIter.hasNext()) insertRemaining(lSum, lSumIter, lThisIter);
+        else if (lOtherIter.hasNext()) insertRemaining(lSum, lSumIter, lOtherIter);
 
         return lSum;
     }
@@ -185,14 +214,14 @@ public final class Polynomial {
 
 
         while (lThisIter.hasNext()) {
-            final Literal lOldLiteral = listNodeToLiteral((ListNode) lThisIter.next());
+            final Literal lOldLiteral = (Literal) lThisIter.next();
 
             final int lDerivCoeff = lOldLiteral.getCoefficient() * lOldLiteral.getExponent();
             final int lDerivExp = lOldLiteral.getExponent() - 1;
 
             if (lDerivCoeff != 0) {
-                final ListNode lNewNode = literalToListNode(lDerivCoeff, lDerivExp);
-                lDerivative.iTerms.insert(lNewNode, (LinkedList.Iterator) lDerivIter);
+                final Literal lDerivativeTerm = new Literal(lDerivCoeff, lDerivExp);
+                lDerivative.iTerms.insert(lDerivativeTerm, (LinkedList.Iterator) lDerivIter);
                 lDerivIter.next();
             }
         }
@@ -217,17 +246,21 @@ public final class Polynomial {
         final Iterator lIterator = this.iTerms.iterator();
 
         if (lIterator.hasNext()) {
-            // insert first element
-            final Literal lFirstLiteral = (Literal)lIterator.next();
-            lPolynomialString.append(termToString(lFirstLiteral));
+            // insert first element, which may or may not be negative
+            final Literal lFirstLiteral = (Literal) lIterator.next();
+            lPolynomialString.append("%s%s".formatted(
+                    lFirstLiteral.getCoefficient() > 0 ? "" : "-",
+                    termToString(lFirstLiteral)));
 
             while (lIterator.hasNext()) {
-                final ListNode lNode = (ListNode) lIterator.next();
-                final Literal lLiteral = (Literal) lNode.getElement();
+                final Literal lLiteral = (Literal) lIterator.next();
+                final String lFormattedTerm = termToString(lLiteral);
 
-                lPolynomialString.append(
-                        " + %s".formatted(termToString(lLiteral))
-                );
+                if (lLiteral.getCoefficient() > 0) {
+                    lPolynomialString.append(" + %s".formatted(lFormattedTerm));
+                } else {
+                    lPolynomialString.append(" - %s".formatted(lFormattedTerm));
+                }
             }
         } else {
             // polynomial is empty
@@ -238,15 +271,18 @@ public final class Polynomial {
     }
 
     /**
-     * Converts the term provided into a string representation
+     * Converts the term provided into a string representation. Note that this method is a helper method for
+     * the toString and will strip out the negative sign.
      * @param pTerm the term to turn into a string
      * @return the string representation of the term
      */
     private static String termToString(final Literal pTerm) {
         final String lTermString;
         final int lTermExponent = pTerm.getExponent();
+        // we need the absolute value, the negative is already formatted
+        final int lTermCoefficient = Math.abs(pTerm.getCoefficient());
 
-        if (pTerm.getCoefficient() == 1) {
+        if (lTermCoefficient == 1) {
             if (lTermExponent > 1) {
                 lTermString = "x^%d".formatted(lTermExponent);
             } else if (lTermExponent < 0) {
@@ -260,15 +296,15 @@ public final class Polynomial {
             }
         } else {
             if (lTermExponent > 1) {
-                lTermString = "%dx^%d".formatted(pTerm.getCoefficient(), lTermExponent);
+                lTermString = "%dx^%d".formatted(lTermCoefficient, lTermExponent);
             } else if (lTermExponent < 0) {
-                lTermString = "%dx^(%d)".formatted(pTerm.getCoefficient(), lTermExponent);
+                lTermString = "%dx^(%d)".formatted(Math.abs(lTermCoefficient), lTermExponent);
             } else {
                 // if the exponent is one or zero
                 if (lTermExponent == 1) {
-                    lTermString = "%dx".formatted(pTerm.getCoefficient());
+                    lTermString = "%dx".formatted(lTermCoefficient);
                 } else {
-                    lTermString = "%d".formatted(pTerm.getCoefficient());
+                    lTermString = "%d".formatted(lTermCoefficient);
                 }
             }
         }
@@ -277,51 +313,28 @@ public final class Polynomial {
     }
 
     /**
-     * cast Node as Literal
-     * @param pNode the node to get the literal from
-     * @return the literal contained in the node
+     * Inserts the remaining elements in pFromIter, into pInto
      */
-    private static Literal listNodeToLiteral(final ListNode pNode) {
-        return (Literal) pNode.getElement();
-    }
-
-    /**
-     * make a node object with empty link based on Literal parameters
-     * @param pCoefficient the coefficient of the literal to be stored
-     * @param pExponent the exponent of the literal to be stored
-     * @return a new list node storing the literal with the parameter data and a null next
-     */
-    private static ListNode literalToListNode(final int pCoefficient,
-                                              final int pExponent) {
-
-        final Literal lNewLiteral = new Literal(pCoefficient, pExponent);
-        return new ListNode(lNewLiteral, null);
-    }
-
-    /**
-     * Inserts the remaining terms from one iterator into the list node and after. For example,
-     * an iterator with
-     * <br>
-     * {@code A -> B -> C}
-     * <br>
-     * remaining will insert into list node
-     * <br>
-     * {@code ... -> D}
-     * <br>
-     * to result in
-     * <br>
-     * {@code ... -> D -> A -> B -> C}.
-     * @param pFrom the iterator that is being inserted from
-     * @param pInto the node to insert terms into and after
-     */
-    private static void insertRemaining(final Iterator pFrom, final ListNode pInto) {
-        while (pFrom.hasNext()) {
-            final Literal lFromLiteral = listNodeToLiteral((ListNode) pFrom.next());
-            pInto.setNext(literalToListNode(lFromLiteral.getCoefficient(), lFromLiteral.getExponent()));
+    private static void insertRemaining(final Polynomial pInto, final Iterator pIntoIter,
+                                        final Iterator pFromIter) {
+        while (pFromIter.hasNext()) {
+            final Literal lFromLiteral = (Literal) pFromIter.next();
+            pInto.iTerms.insert(lFromLiteral, (LinkedList.Iterator) pIntoIter);
+            pIntoIter.next();
         }
     }
 
-    /**
-     * Get the correct string for
-     */
+    private class ModifiedLinkedList extends LinkedList {
+        public void test() {
+
+        }
+
+        public void insert(final Literal element, final java.util.Iterator pointer) {
+            super.insert(element, (LinkedList.Iterator) pointer);
+        }
+
+        public void remove(final java.util.Iterator pointer) {
+            super.remove((LinkedList.Iterator) pointer);
+        }
+    }
 }
