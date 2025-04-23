@@ -1,4 +1,4 @@
-package uw.tcss.TCSS_375.Week_03;
+package uw.tcss.TCSS_342.Week_03;
 
 /**
  * A Literal in a Polynomial, consisting of an

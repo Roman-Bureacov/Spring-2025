@@ -1,4 +1,4 @@
-package uw.tcss.TCSS_375.Week_03;
+package uw.tcss.TCSS_342.Week_03;
 
 /**
  * The part of the polynomial calculator that responds to

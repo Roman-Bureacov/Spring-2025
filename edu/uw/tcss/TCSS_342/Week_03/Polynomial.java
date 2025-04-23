@@ -1,4 +1,4 @@
-package uw.tcss.TCSS_375.Week_03;
+package uw.tcss.TCSS_342.Week_03;
 
 import java.util.Iterator;
 
@@ -30,7 +30,7 @@ public final class Polynomial {
         // zero check
         if (pCoefficient == 0) return;
 
-        // is the list is empty...
+        // if the list is empty...
         if (this.iTerms.isEmpty()) {
             this.iTerms.insert(
                     new Literal(pCoefficient, pExponent),
