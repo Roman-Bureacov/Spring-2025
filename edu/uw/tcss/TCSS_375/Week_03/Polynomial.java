@@ -205,6 +205,9 @@ public final class Polynomial {
         Polynomial lProduct = new Polynomial();
         final Iterator lThisIter = this.iTerms.iterator();
 
+        // we can take the idea that we can just multiply a polynomial by each term, and then
+        // sum up all the products
+        // i.e. (x + 2) * (x^2 + 1) = x(x^2 + 1) + 2(x^2 + 1)
         while (lThisIter.hasNext()) {
             final Polynomial lSubProd = multiplyTerm((Literal) lThisIter.next(), pPolynomial);
             lProduct = lProduct.plus(lSubProd);
