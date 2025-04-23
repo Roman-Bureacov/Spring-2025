@@ -133,65 +133,44 @@ public final class Polynomial {
         final Polynomial lSum = new Polynomial();
         final Iterator lSumIter = lSum.iTerms.zeroth();
 
-        // add terms
+        // if neither are empty
         if (lThisIter.hasNext() && lOtherIter.hasNext()) {
             Literal lThisLiteral = (Literal) lThisIter.next();
             Literal lOtherLiteral = (Literal) lOtherIter.next();
 
+            boolean lAdvanceThis = false;
+            boolean lAdvanceOther = false;
             while (lThisIter.hasNext() && lOtherIter.hasNext()) {
-                final int lThisExp = lThisLiteral.getExponent();
-                final int lOtherExp = lOtherLiteral.getExponent();
+                if (lAdvanceThis) lThisLiteral = (Literal) lThisIter.next();
+                if (lAdvanceOther) lOtherLiteral = (Literal) lOtherIter.next();
 
-                if (lThisExp == lOtherExp) {
+                final int lThisLiteralExp = lThisLiteral.getExponent();
+                final int lOtherLiteralExp = lOtherLiteral.getExponent();
+                lAdvanceThis = false;
+                lAdvanceOther = false;
+
+                if (lThisLiteralExp == lOtherLiteralExp) {
                     final int lNewCoefficient = lThisLiteral.getCoefficient() + lOtherLiteral.getCoefficient();
                     if (lNewCoefficient != 0) {
-                        lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp),  lSumIter);
+                        final Literal lNewLiteral = new Literal(lNewCoefficient, lThisLiteralExp);
+                        lSum.iTerms.insert(lNewLiteral, lSumIter);
+                        lSumIter.next();
                     }
-                    lThisLiteral = (Literal) lThisIter.next();
-                    lOtherLiteral = (Literal) lOtherIter.next();
-                } else if (lThisExp > lOtherExp) {
-                    final Literal lNewLiteral = new Literal(lThisLiteral.getCoefficient(), lThisExp);
-                    lSum.iTerms.insert(lNewLiteral,  lSumIter);
-                    lThisLiteral = (Literal) lThisIter.next();
-                } else { // lThisExp < lOtherExp
-                    final Literal lNewLiteral = new Literal(lOtherLiteral.getCoefficient(), lOtherExp);
-                    lSum.iTerms.insert(lNewLiteral,  lSumIter);
-                    lOtherLiteral = (Literal) lOtherIter.next();
-                }
-
-                lSumIter.next();
-            }
-
-            // final comparison
-            // the final two terms have one or both with no hasNext, thus the loop breaks early
-            final int lThisExp = lThisLiteral.getExponent();
-            final int lOtherExp = lOtherLiteral.getExponent();
-
-            if (lThisExp == lOtherExp) {
-                final int lNewCoefficient = lThisLiteral.getCoefficient() + lOtherLiteral.getCoefficient();
-                if (lNewCoefficient != 0) {
-                    lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp),  lSumIter);
-                }
-
-                // insert the rest of the terms
-                if (lThisIter.hasNext()) insertRemainingSum(lSum, lSumIter, lThisIter);
-                else if (lOtherIter.hasNext()) insertRemainingSum(lSum, lSumIter, lOtherIter);
-            } else {
-                // we need to find where the last term fits
-                final Literal lFinalTerm;
-                if (lThisIter.hasNext()) {
-                    lFinalTerm = lOtherLiteral;
-                    insertRemainingSumWithFinalTerm(lSum, lSumIter, lThisIter, lFinalTerm, lThisLiteral);
-                } else if (lOtherIter.hasNext()) {
-                    lFinalTerm = lThisLiteral;
-                    insertRemainingSumWithFinalTerm(lSum, lSumIter, lOtherIter, lFinalTerm, lOtherLiteral);
+                    lAdvanceThis = true;
+                    lAdvanceOther = true;
+                } else if (lThisLiteralExp > lOtherLiteralExp) {
+                    lSum.iTerms.insert(lThisLiteral, lSumIter);
+                    lAdvanceThis = true;
+                    lSumIter.next();
+                } else { // thisExp < otherExp
+                    lSum.iTerms.insert(lOtherLiteral, lSumIter);
+                    lAdvanceOther = true;
+                    lSumIter.next();
                 }
             }
-
-        } else {
-            // one of the two polynomials are empty
-            // TODO: this
         }
+        if (lThisIter.hasNext()) insertRemainingSum(lSum, lSumIter, lThisIter);
+        else if (lOtherIter.hasNext()) insertRemainingSum(lSum, lSumIter, lOtherIter);
 
         return lSum;
     }
@@ -329,52 +308,6 @@ public final class Polynomial {
             pInto.iTerms.insert(lFromLiteral, pIntoIter);
             pIntoIter.next();
         }
-    }
-
-
-    /**
-     * Inserts the remaining terms and finds a spot for the final term.
-     * @param pInto the polynomial to insert into
-     * @param pIntoIter the iterator of the into polynomial
-     * @param pFromIter the iterator of the polynomial being added from
-     * @param pFinalTerm the last term remaining from the two polynomials
-     * @param pLastFromTerm the term last seen before entering this method in the from Polynomial, returned
-     *                      by the pFromIter iterator
-     */
-    private static void insertRemainingSumWithFinalTerm(final Polynomial pInto, final Iterator pIntoIter,
-                                                        final Iterator pFromIter,
-                                                        final Literal pFinalTerm, final Literal pLastFromTerm) {
-        if (pFinalTerm.getExponent() > pLastFromTerm.getExponent()) {
-            pInto.iTerms.insert(pFinalTerm, pIntoIter);
-            pIntoIter.next();
-            pInto.iTerms.insert(pLastFromTerm, pIntoIter);
-            pIntoIter.next();
-            insertRemainingSum(pInto, pIntoIter, pFromIter);
-        } else {
-            // the problem this term belongs somewhere in the middle
-            pInto.iTerms.insert(pLastFromTerm, pIntoIter);
-            pIntoIter.next();
-
-            while (pFromIter.hasNext()) {
-                final Literal lNewTerm = (Literal) pFromIter.next();
-                if (pFinalTerm.getExponent() > lNewTerm.getExponent()) {
-                    pInto.iTerms.insert(pFinalTerm, pIntoIter);
-                    pIntoIter.next();
-                    pInto.iTerms.insert(lNewTerm, pIntoIter);
-                    pIntoIter.next();
-                    insertRemainingSum(pInto, pIntoIter, pFromIter);
-                    // we inserted the remaining, we can exit
-                    return;
-                } else {
-                    pInto.iTerms.insert(lNewTerm, pIntoIter);
-                    pIntoIter.next();
-                }
-            }
-
-        }
-
-        // if we went through the entire list and didn't add the final element
-        pInto.iTerms.insert(pFinalTerm, pIntoIter);
     }
 
     /**
