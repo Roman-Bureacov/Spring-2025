@@ -75,13 +75,13 @@ public final class Polynomial {
                             lNewCoefficient = lCurrentLiteral.getCoefficient() + pCoefficient;
                             if (lNewCoefficient != 0) {
                                 lNewLiteral = new Literal(lNewCoefficient, pExponent);
-                                this.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lIterCurrent);
+                                this.iTerms.insert(lNewLiteral,  lIterCurrent);
                             }
                             return;
                         } else {
                             if (lPreviousExp > pExponent && pExponent > lCurrentLiteral.getExponent()) {
                                 lNewLiteral = new Literal(pCoefficient, pExponent);
-                                this.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lIterCurrent);
+                                this.iTerms.insert(lNewLiteral,  lIterCurrent);
                                 return;
                             }
                             lPreviousExp = lCurrentLiteral.getExponent();
@@ -89,7 +89,7 @@ public final class Polynomial {
                     }
                     // failed to insert term before and now at last term
                     lIterCurrent.next(); // advance iterator into position
-                    this.iTerms.insert(new Literal(pCoefficient, pExponent), (LinkedList.Iterator) lIterCurrent);
+                    this.iTerms.insert(new Literal(pCoefficient, pExponent),  lIterCurrent);
                 }
             }
         }
@@ -113,7 +113,7 @@ public final class Polynomial {
                     lWorkingLiteral.getExponent()
             );
 
-            lNegativePoly.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lOtherIter);
+            lNegativePoly.iTerms.insert(lNewLiteral,  lOtherIter);
 
             lOtherIter.next();
         }
@@ -145,17 +145,17 @@ public final class Polynomial {
                 if (lThisExp == lOtherExp) {
                     final int lNewCoefficient = lThisLiteral.getCoefficient() + lOtherLiteral.getCoefficient();
                     if (lNewCoefficient != 0) {
-                        lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp), (LinkedList.Iterator) lSumIter);
+                        lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp),  lSumIter);
                     }
                     lThisLiteral = (Literal) lThisIter.next();
                     lOtherLiteral = (Literal) lOtherIter.next();
                 } else if (lThisExp > lOtherExp) {
                     final Literal lNewLiteral = new Literal(lThisLiteral.getCoefficient(), lThisExp);
-                    lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
+                    lSum.iTerms.insert(lNewLiteral,  lSumIter);
                     lThisLiteral = (Literal) lThisIter.next();
                 } else { // lThisExp < lOtherExp
                     final Literal lNewLiteral = new Literal(lOtherLiteral.getCoefficient(), lOtherExp);
-                    lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
+                    lSum.iTerms.insert(lNewLiteral,  lSumIter);
                     lOtherLiteral = (Literal) lOtherIter.next();
                 }
 
@@ -170,14 +170,14 @@ public final class Polynomial {
             if (lThisExp == lOtherExp) {
                 final int lNewCoefficient = lThisLiteral.getCoefficient() + lOtherLiteral.getCoefficient();
                 if (lNewCoefficient != 0) {
-                    lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp), (LinkedList.Iterator) lSumIter);
+                    lSum.iTerms.insert(new Literal(lNewCoefficient, lThisExp),  lSumIter);
                 }
             } else if (lThisExp > lOtherExp) {
                 final Literal lNewLiteral = new Literal(lThisLiteral.getCoefficient(), lThisExp);
-                lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
+                lSum.iTerms.insert(lNewLiteral,  lSumIter);
             } else { // lThisExp < lOtherExp
                 final Literal lNewLiteral = new Literal(lOtherLiteral.getCoefficient(), lOtherExp);
-                lSum.iTerms.insert(lNewLiteral, (LinkedList.Iterator) lSumIter);
+                lSum.iTerms.insert(lNewLiteral,  lSumIter);
             }
 
             lSumIter.next();
@@ -221,7 +221,7 @@ public final class Polynomial {
 
             if (lDerivCoeff != 0) {
                 final Literal lDerivativeTerm = new Literal(lDerivCoeff, lDerivExp);
-                lDerivative.iTerms.insert(lDerivativeTerm, (LinkedList.Iterator) lDerivIter);
+                lDerivative.iTerms.insert(lDerivativeTerm,  lDerivIter);
                 lDerivIter.next();
             }
         }
@@ -319,17 +319,17 @@ public final class Polynomial {
                                         final Iterator pFromIter) {
         while (pFromIter.hasNext()) {
             final Literal lFromLiteral = (Literal) pFromIter.next();
-            pInto.iTerms.insert(lFromLiteral, (LinkedList.Iterator) pIntoIter);
+            pInto.iTerms.insert(lFromLiteral, pIntoIter);
             pIntoIter.next();
         }
     }
 
+    /**
+     * Wrapper class for the linked list class, to prevent constant casting from obfuscating code.
+     */
     private class ModifiedLinkedList extends LinkedList {
-        public void test() {
 
-        }
-
-        public void insert(final Literal element, final java.util.Iterator pointer) {
+        public void insert(final Object element, final java.util.Iterator pointer) {
             super.insert(element, (LinkedList.Iterator) pointer);
         }
 
