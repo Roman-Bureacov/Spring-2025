@@ -14,8 +14,7 @@ import java.util.Scanner;
  * Does the timing and all the tests for the specified files
  */
 public final class DictionaryAppImproved {
-    private final static String WORKING_DIR_NAME = "edu/uw/tcss/TCSS_342/Week_06/text";
-    private final static File WORKING_DIR = new File(WORKING_DIR_NAME);
+    private final static String WORKING_DIR_NAME = "edu/uw/tcss/TCSS_342/Week_06";
 
     private final static String OUT_DIR_NAME =
             String.join("/", WORKING_DIR_NAME, "out");
@@ -27,8 +26,11 @@ public final class DictionaryAppImproved {
 
 
     public static void main(final String... pArgs) throws IOException {
+        final String lPathToText =
+                String.join("/", WORKING_DIR_NAME, "/text");
+        final File lTextDir = new File(lPathToText);
         final File[] lTextFiles =
-                WORKING_DIR.listFiles((file, name) -> name.toLowerCase().endsWith(".txt"));
+                lTextDir.listFiles((file, name) -> name.toLowerCase().endsWith(".txt"));
 
         setupOutput();
 
@@ -40,11 +42,10 @@ public final class DictionaryAppImproved {
                 writeRuntimeStats(lDataStructureStats, workingFile);
             }
         } else {
-            System.out.println("Failed to find directory! " + WORKING_DIR.getAbsolutePath());
-            return;
+            throw new IOException("Failed to find directory! " + lTextDir.getAbsolutePath());
         }
 
-        System.out.println("All processing done, see out.csv");
+        System.out.println("All processing done, see out/RunTimeStats.csv");
     }
 
     /**
@@ -185,7 +186,7 @@ public final class DictionaryAppImproved {
      */
     private static String clean(final File pFile) throws IOException {
         final Scanner lInput = new Scanner(pFile, StandardCharsets.UTF_16BE);
-        lInput.useDelimiter("[^a-zA-Z0-9']"); // any non-word character
+        lInput.useDelimiter("[^a-zA-Z0-9']+"); // any non-word character
         final StringBuilder lOutput = new StringBuilder();
 
         int lWordCount = 0;
