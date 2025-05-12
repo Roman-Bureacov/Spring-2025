@@ -223,7 +223,7 @@ public final class DictionaryAppImproved {
         );
 
         try (final BufferedWriter lWriter = new BufferedWriter(new FileWriter(lOutPath))) {
-            lWriter.append("Top 10 words for %s\n".formatted(pFile.getName()));
+            lWriter.append("Top 10 words for %s (in ascending order)\n".formatted(pFile.getName()));
             final List<String> lTopWords = ((AvlTree) lStats[2].dataStructure).getMostFrequent(10);
             for (final String word : lTopWords) lWriter.append("%s\n".formatted(word));
         }
