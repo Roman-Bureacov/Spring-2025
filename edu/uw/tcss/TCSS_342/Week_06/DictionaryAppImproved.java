@@ -236,8 +236,9 @@ public final class DictionaryAppImproved {
 
             lLine.append(lStats[0].runningTimeMillis);
 
-            for (final DataStructStats stat : lStats) {
-                lLine.append(",%s".formatted(stat.runningTimeMillis));
+            final int lStatsLength = lStats.length;
+            for (int i = 1; i < lStatsLength; i++) {
+                lLine.append(",%s".formatted(lStats[i].runningTimeMillis));
             }
 
             lWriter.append("%s\n".formatted(lLine));
