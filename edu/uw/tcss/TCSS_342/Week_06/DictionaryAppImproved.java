@@ -11,7 +11,9 @@ import java.util.Scanner;
 /**
  * A modern improvement over the DictionaryApp application.
  *
- * Does the timing and all the tests for the specified files
+ * Does the timing and all the tests for the specified files.
+ * @author Roman Bureacov
+ * @version 2025-05-17
  */
 public final class DictionaryAppImproved {
     private final static String WORKING_DIR_NAME = "edu/uw/tcss/TCSS_342/Week_06";
