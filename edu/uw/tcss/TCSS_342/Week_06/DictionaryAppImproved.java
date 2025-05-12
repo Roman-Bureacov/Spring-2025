@@ -247,19 +247,19 @@ public final class DictionaryAppImproved {
     }
 
     private final static class Timer {
-        long fStartTime;
-        long fEndTime;
+        long iStartTime;
+        long iEndTime;
 
         public void start() {
-            fStartTime = System.currentTimeMillis();
+            this.iStartTime = System.currentTimeMillis();
         }
 
         public void stop() {
-            fEndTime = System.currentTimeMillis();
+            this.iEndTime = System.currentTimeMillis();
         }
 
         public int getTotalTime() {
-            return (int) (this.fEndTime - this.fStartTime);
+            return (int) (this.iEndTime - this.iStartTime);
         }
     }
 
