@@ -1,6 +1,10 @@
 package uw.tcss.TCSS_342.Week_06;
 
 import java.lang.Comparable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 // AvlTree class
 //
@@ -280,7 +284,90 @@ public class AvlTree {
      * along with their frequency.
      */
     public void PrintMostFrequent() {
-        System.out.println("PrintMostFrequent: Not implemented yet.");
+        // TODO: implement
+
+        final List<String> lTopWords = getMostFrequent(10, this.root);
+
+        System.out.println("Most Frequent Words in AVL Tree:");
+        lTopWords.forEach(System.out::println);
+        System.out.println();
+    }
+
+    public List<String> getMostFrequent(final int pCount) {
+        return getMostFrequent(pCount, this.root);
+    }
+
+    /**
+     * Gets the most frequent nodes as a list of strings, sorted
+     * in ascending order
+     *
+     * @param pCount the top n words
+     * @return a list of the top n words
+     */
+    private static List<String> getMostFrequent(final int pCount, final AvlNode pRoot) {
+        final AvlNode[] lAvlNodes = new AvlNode[pCount];
+
+        // insert the elements based on counts
+        lAvlNodes[0] = pRoot;
+
+        addNodesToArray(lAvlNodes, pRoot,
+                Comparator.comparingInt(node -> node.elementCount));
+
+        // convert nodes into their elements
+        final List<String> lTopWords = new ArrayList<>(pCount);
+        for (final AvlNode node : lAvlNodes) {
+            lTopWords.add((String) node.element);
+        }
+
+        // TODO: test print, need to remove
+        Arrays.stream(lAvlNodes).toList().forEach(
+                node -> System.out.format("word %-30s count %d\n", node.element, node.elementCount));
+
+        return List.copyOf(lTopWords);
+    }
+
+    /**
+     * recursive method that adds the avl nodes into the array
+     * @param pAvlNodes the array of nodes
+     * @param pNode the node to examine
+     * @param pComparator the comparison to be done
+     */
+    private static void addNodesToArray(final AvlNode[] pAvlNodes,
+                                        final AvlNode pNode,
+                                        final Comparator<AvlNode> pComparator) {
+
+        if (pNode == null) return;
+
+        final int lArraySize = pAvlNodes.length;
+
+        // if array isn't full, shift and add
+        if (pComparator.compare(pNode, pAvlNodes[0]) < 0 && pAvlNodes[lArraySize - 1] == null) {
+                // shift elements by 1 starting from the end
+                for (int i = lArraySize - 1; 0 < i; i--) {
+                    final var lTemp = pAvlNodes[i];
+                    pAvlNodes[i] = pAvlNodes[i - 1];
+                    pAvlNodes[i - 1] = lTemp;
+                }
+
+                pAvlNodes[0] = pNode;
+        } else {
+            if (pComparator.compare(pNode, pAvlNodes[0]) >= 0) {
+                // else we know the array is full and this element must exist somewhere...
+                for (int i = lArraySize - 1; 0 <= i; i--) {
+                    if (pAvlNodes[i] == null) pAvlNodes[i] = pNode;
+                    else if (pComparator.compare(pAvlNodes[i], pNode) <= 0) {
+                        // shift everything left
+                        for (int j = 0; j < i; j++) {
+                            pAvlNodes[j] = pAvlNodes[j + 1];
+                        }
+                        pAvlNodes[i] = pNode;
+                    }
+                }
+            } else return; // every next element in the subtree will be less than the first element in the array
+        }
+
+        addNodesToArray(pAvlNodes, pNode.left, pComparator);
+        addNodesToArray(pAvlNodes, pNode.right, pComparator);
     }
     
     
