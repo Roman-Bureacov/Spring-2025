@@ -291,6 +291,11 @@ public class AvlTree {
         System.out.println();
     }
 
+    /**
+     * Helper method to redirect the most frequent to the more generic method
+     * @param pCount the top what words to find
+     * @return the top n words as specified
+     */
     public List<String> getMostFrequent(final int pCount) {
         return getMostFrequent(pCount, this.root);
     }
@@ -310,13 +315,6 @@ public class AvlTree {
 
         addNodesToArray(lAvlNodes, pRoot, Comparator.comparingInt(node -> node.elementCount));
 
-        /*
-        Arrays.stream(lAvlNodes).toList().forEach(
-                node -> {
-                    if (node != null) System.out.format("word %-30s count %d\n", node.element, node.elementCount);
-                });
-        */
-
         // convert nodes into their elements
         final List<String> lTopWords = new ArrayList<>(pCount);
         for (final AvlNode node : lAvlNodes) {
@@ -327,7 +325,7 @@ public class AvlTree {
     }
 
     /**
-     * recursive method that adds the avl nodes into the array
+     * recursive method that adds the avl nodes into the array in ascending order.
      * @param pAvlNodes the array of nodes
      * @param pNode the node to examine
      * @param pComparator the comparison to be done
@@ -366,6 +364,12 @@ public class AvlTree {
         addNodesToArray(pAvlNodes, pNode.right, pComparator);
     }
 
+    /**
+     * Inserts the node into an ascending-order array as needed
+     * @param pAvlNodes the array of nodes
+     * @param pNode the node to insert
+     * @param pComparator the comparison to use
+     */
     private static void insertInNonFullArray(final AvlNode[] pAvlNodes,
                                              final AvlNode pNode,
                                              final Comparator<AvlNode> pComparator) {
