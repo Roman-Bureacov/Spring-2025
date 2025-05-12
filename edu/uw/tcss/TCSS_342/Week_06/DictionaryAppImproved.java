@@ -2,11 +2,9 @@ package uw.tcss.TCSS_342.Week_06;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,11 +17,11 @@ public final class DictionaryAppImproved {
     private final static String WORKING_DIR_NAME = "edu/uw/tcss/TCSS_342/Week_06/text";
     private final static File WORKING_DIR = new File(WORKING_DIR_NAME);
 
-    private final static String OUT_DIR_NAME = "uw/tcss/TCSS_342/Week_06/out";
+    private final static String OUT_DIR_NAME = "edu/uw/tcss/TCSS_342/Week_06/out";
     private final static File OUT_DIR = new File(OUT_DIR_NAME);
 
     private final static String OUTPUT_RT_STATS_FILE_NAME =
-            String.join("/", OUT_DIR_NAME, "out.csv");
+            String.join("/", OUT_DIR_NAME, "RunTimeStats.csv");
     private final static File OUTPUT_RT_STATS_FILE = new File(OUTPUT_RT_STATS_FILE_NAME);
 
 
@@ -31,28 +29,7 @@ public final class DictionaryAppImproved {
         final File[] lTextFiles =
                 WORKING_DIR.listFiles((file, name) -> name.toLowerCase().endsWith(".txt"));
 
-        // set up the output directory
-        if (!OUT_DIR.exists()) {
-            if (OUT_DIR.mkdirs()) throw new IOException(
-                    "Could not create directory! %s".formatted(OUT_DIR.getAbsolutePath())
-            );
-        }
-
-        // set up the output file header
-        if (OUTPUT_RT_STATS_FILE.exists()) {
-            if (!OUTPUT_RT_STATS_FILE.delete()) throw new IOException(
-                    "Could not overwrite output file! %s".formatted(OUTPUT_RT_STATS_FILE.getAbsolutePath())
-            );
-        }
-
-        if (!OUTPUT_RT_STATS_FILE.createNewFile()) throw new IOException(
-                "Could not create stats file! %s".formatted(OUTPUT_RT_STATS_FILE.getAbsolutePath())
-        );
-
-        try (final BufferedWriter lWriter = new BufferedWriter(new FileWriter(OUTPUT_RT_STATS_FILE, true))) {
-            lWriter.append(
-                    "file,Binary Search Tree Time, Splay Tree Time, AVL Tree Time, Quadratic Probing Hash Table Time");
-        }
+        setupOutput();
 
         // Run the tests on all files
         if (lTextFiles != null) {
@@ -70,6 +47,39 @@ public final class DictionaryAppImproved {
     }
 
     /**
+     * Sets up the output file for runtime stats
+     * @throws IOException if a file or directory could not be made
+     */
+    private static void setupOutput() throws IOException {
+        // set up the output directory
+        if (!OUT_DIR.exists()) {
+            if (!OUT_DIR.mkdir()) throw new IOException(
+                    "Could not create directory! %s".formatted(OUT_DIR.getAbsolutePath())
+            );
+        }
+
+        // set up the output file header
+
+        // make a new file for output
+        if (OUTPUT_RT_STATS_FILE.exists()) {
+            if (!OUTPUT_RT_STATS_FILE.delete()) throw new IOException(
+                    "Could not overwrite output file! %s".formatted(OUTPUT_RT_STATS_FILE.getAbsolutePath())
+            );
+        }
+
+        if (!OUTPUT_RT_STATS_FILE.createNewFile()) throw new IOException(
+                "Could not create stats file! %s".formatted(OUTPUT_RT_STATS_FILE.getAbsolutePath())
+        );
+
+        try (final BufferedWriter lWriter = new BufferedWriter(new FileWriter(OUTPUT_RT_STATS_FILE, true))) {
+            lWriter.append(
+                "file,Binary Search Tree Time, Splay Tree Time, AVL Tree Time, Quadratic Probing Hash Table Time\n");
+        }
+
+        System.out.println(OUT_DIR.getAbsolutePath());
+    }
+
+    /**
      * Runs the test with the data structures on the file.
      *
      * @param pFile the file to test
@@ -77,7 +87,7 @@ public final class DictionaryAppImproved {
      * <br>Binary Search Tree, Splay Tree, AVL Tree, Hash Table
      */
     private static DataStructStats[] runTests(final File pFile) throws IOException {
-        System.out.format("== Running test on %s\n", pFile.getName());
+        System.out.format("\n== Running test on %s\n", pFile.getName());
         final DataStructStats[] lStats = new DataStructStats[4];
         final Timer lTimer = new Timer();
 
@@ -177,9 +187,14 @@ public final class DictionaryAppImproved {
         lInput.useDelimiter("\\W+"); // any non-word character
         final StringBuilder lOutput = new StringBuilder();
 
+        int lWordCount = 0;
+
         while (lInput.hasNext()) {
+            lWordCount++;
             lOutput.append("%s ".formatted(lInput.next().toLowerCase()));
         }
+
+        System.out.format("%d words counted total\n", lWordCount);
 
         return lOutput.toString();
     }
@@ -193,7 +208,7 @@ public final class DictionaryAppImproved {
                 String.join(
                         "/",
                         OUT_DIR_NAME,
-                        "%s-topWordStats.txt".formatted(pFile.getName())
+                        "%s-topWordStats.txt".formatted(pFile.getName().split("\\.")[0])
                 );
         final File lOutFile = new File(lOutPath);
         if (lOutFile.exists()) {

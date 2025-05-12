@@ -20,5 +20,5 @@ class AvlNode {
     AvlNode    left;         // Left child
     AvlNode    right;        // Right child
     int        height;       // Height
-    int        elementCount;  // the number of times this element was inserted
+    int        elementCount = 1;  // the number of times this element was inserted
 }

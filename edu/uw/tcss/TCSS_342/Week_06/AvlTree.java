@@ -286,7 +286,7 @@ public class AvlTree {
     public void PrintMostFrequent() {
         final List<String> lTopWords = getMostFrequent(10, this.root);
 
-        System.out.println("Most Frequent Words in AVL Tree:");
+        System.out.println("Most Frequent Words in AVL Tree in ascending order:");
         lTopWords.forEach(System.out::println);
         System.out.println();
     }
@@ -310,12 +310,12 @@ public class AvlTree {
 
         addNodesToArray(lAvlNodes, pRoot, Comparator.comparingInt(node -> node.elementCount));
 
-        // TODO: test print, need to remove
-        System.out.println(Arrays.toString(lAvlNodes));
+        /*
         Arrays.stream(lAvlNodes).toList().forEach(
                 node -> {
                     if (node != null) System.out.format("word %-30s count %d\n", node.element, node.elementCount);
                 });
+        */
 
         // convert nodes into their elements
         final List<String> lTopWords = new ArrayList<>(pCount);
@@ -335,7 +335,6 @@ public class AvlTree {
     private static void addNodesToArray(final AvlNode[] pAvlNodes,
                                         final AvlNode pNode,
                                         final Comparator<AvlNode> pComparator) {
-
         if (pNode == null) return;
 
         final int lArraySize = pAvlNodes.length;
@@ -359,7 +358,8 @@ public class AvlTree {
                         break;
                     }
                 }
-            } else return; // every next element in the subtree will be less than the first element in the array
+            }
+            // otherwise it the node is less than everything else in the array
         }
 
         addNodesToArray(pAvlNodes, pNode.left, pComparator);
