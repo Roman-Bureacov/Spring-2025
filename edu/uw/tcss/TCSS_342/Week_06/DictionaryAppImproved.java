@@ -185,7 +185,7 @@ public final class DictionaryAppImproved {
      */
     private static String clean(final File pFile) throws IOException {
         final Scanner lInput = new Scanner(pFile, StandardCharsets.UTF_16BE);
-        lInput.useDelimiter("\\W+"); // any non-word character
+        lInput.useDelimiter("[^a-zA-Z0-9']"); // any non-word character
         final StringBuilder lOutput = new StringBuilder();
 
         int lWordCount = 0;
