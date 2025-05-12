@@ -284,8 +284,6 @@ public class AvlTree {
      * along with their frequency.
      */
     public void PrintMostFrequent() {
-        // TODO: implement
-
         final List<String> lTopWords = getMostFrequent(10, this.root);
 
         System.out.println("Most Frequent Words in AVL Tree:");
@@ -310,18 +308,20 @@ public class AvlTree {
         // insert the elements based on counts
         lAvlNodes[0] = pRoot;
 
-        addNodesToArray(lAvlNodes, pRoot,
-                Comparator.comparingInt(node -> node.elementCount));
+        addNodesToArray(lAvlNodes, pRoot, Comparator.comparingInt(node -> node.elementCount));
+
+        // TODO: test print, need to remove
+        System.out.println(Arrays.toString(lAvlNodes));
+        Arrays.stream(lAvlNodes).toList().forEach(
+                node -> {
+                    if (node != null) System.out.format("word %-30s count %d\n", node.element, node.elementCount);
+                });
 
         // convert nodes into their elements
         final List<String> lTopWords = new ArrayList<>(pCount);
         for (final AvlNode node : lAvlNodes) {
-            lTopWords.add((String) node.element);
+            if (node != null) lTopWords.add((String) node.element);
         }
-
-        // TODO: test print, need to remove
-        Arrays.stream(lAvlNodes).toList().forEach(
-                node -> System.out.format("word %-30s count %d\n", node.element, node.elementCount));
 
         return List.copyOf(lTopWords);
     }
@@ -340,27 +340,23 @@ public class AvlTree {
 
         final int lArraySize = pAvlNodes.length;
 
-        // if array isn't full, shift and add
-        if (pComparator.compare(pNode, pAvlNodes[0]) < 0 && pAvlNodes[lArraySize - 1] == null) {
-                // shift elements by 1 starting from the end
-                for (int i = lArraySize - 1; 0 < i; i--) {
-                    final var lTemp = pAvlNodes[i];
-                    pAvlNodes[i] = pAvlNodes[i - 1];
-                    pAvlNodes[i - 1] = lTemp;
-                }
-
-                pAvlNodes[0] = pNode;
-        } else {
-            if (pComparator.compare(pNode, pAvlNodes[0]) >= 0) {
-                // else we know the array is full and this element must exist somewhere...
-                for (int i = lArraySize - 1; 0 <= i; i--) {
-                    if (pAvlNodes[i] == null) pAvlNodes[i] = pNode;
-                    else if (pComparator.compare(pAvlNodes[i], pNode) <= 0) {
+        // if the array is not full...
+        if (pAvlNodes[lArraySize - 1] == null) {
+            insertInNonFullArray(pAvlNodes, pNode, pComparator);
+        } else { // we know the array is full
+            if (pComparator.compare(pNode, pAvlNodes[0]) >= 0) { // if it's greater than the first element
+                for (int i = lArraySize - 1; 0 <= i; i--) { // starting from the right (the largest)
+                    final int lComparisonResult = pComparator.compare(pNode, pAvlNodes[i]);
+                    if (lComparisonResult > 0) {
                         // shift everything left
                         for (int j = 0; j < i; j++) {
                             pAvlNodes[j] = pAvlNodes[j + 1];
                         }
                         pAvlNodes[i] = pNode;
+                        break;
+                    } else if (lComparisonResult == 0) {
+                        pAvlNodes[i] = pNode;
+                        break;
                     }
                 }
             } else return; // every next element in the subtree will be less than the first element in the array
@@ -368,6 +364,42 @@ public class AvlTree {
 
         addNodesToArray(pAvlNodes, pNode.left, pComparator);
         addNodesToArray(pAvlNodes, pNode.right, pComparator);
+    }
+
+    private static void insertInNonFullArray(final AvlNode[] pAvlNodes,
+                                             final AvlNode pNode,
+                                             final Comparator<AvlNode> pComparator) {
+        final int lArraySize = pAvlNodes.length;
+
+        if (pComparator.compare(pNode, pAvlNodes[0]) < 0) {
+            // shift elements to the right by 1 starting from the end
+            for (int j = lArraySize - 1; 0 < j; j--) {
+                pAvlNodes[j] = pAvlNodes[j - 1];
+            }
+
+            pAvlNodes[0] = pNode;
+        } else {
+            for (int i = 0; i < lArraySize; i++) {
+                if (pAvlNodes[i] == null) {
+                    pAvlNodes[i] = pNode;
+                    break;
+                } else {
+                    final int lComparisonResult = pComparator.compare(pNode, pAvlNodes[i]);
+                    if (lComparisonResult < 0) {
+                        // shift elements to the right by 1 and insert the element
+                        for (int j = lArraySize - 1; i < j; j--) {
+                            pAvlNodes[j] = pAvlNodes[j - 1];
+                        }
+                        pAvlNodes[i] = pNode;
+                        break;
+                    } else if (lComparisonResult == 0) {
+                        pAvlNodes[i] = pNode;
+                        break;
+                    }
+                }
+
+            }
+        }
     }
     
     
