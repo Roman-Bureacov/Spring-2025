@@ -17,7 +17,8 @@ public final class DictionaryAppImproved {
     private final static String WORKING_DIR_NAME = "edu/uw/tcss/TCSS_342/Week_06/text";
     private final static File WORKING_DIR = new File(WORKING_DIR_NAME);
 
-    private final static String OUT_DIR_NAME = "edu/uw/tcss/TCSS_342/Week_06/out";
+    private final static String OUT_DIR_NAME =
+            String.join("/", WORKING_DIR_NAME, "out");
     private final static File OUT_DIR = new File(OUT_DIR_NAME);
 
     private final static String OUTPUT_RT_STATS_FILE_NAME =
