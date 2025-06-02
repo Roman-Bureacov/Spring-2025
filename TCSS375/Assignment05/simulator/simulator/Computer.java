@@ -122,11 +122,7 @@ public class Computer {
 			loadWord(i, instruction);
 		}
 	}
-	
-	
-	
-	
-	
+
 	// The next 6 methods are used to execute the required instructions:
 	// BR, ADD, LD, ST, AND, NOT, TRAP
 	
@@ -148,8 +144,8 @@ public class Computer {
 		if ((lIRBits & lCurrentCCBits) != 0) { // if any bit matches
 			// PC + offset
 			final int lCurrentPC = this.mPC.getUnsignedValue();
-			final int lPCOffset = this.mIR.substring(7, 9).getUnsignedValue();
-			this.mIR.setUnsignedValue(lCurrentPC + lPCOffset);
+			final int lOffset = this.mIR.substring(7, 9).get2sCompValue();
+			this.mPC.setUnsignedValue(lCurrentPC + lOffset);
 		}
 	}
 	
@@ -210,7 +206,7 @@ public class Computer {
 	 */
 	public void executeStore() {
 		final int lSrcReg = this.getFirstRegOfIRBitString();
-		final int lCurrentPC = this.mIR.getUnsignedValue();
+		final int lCurrentPC = this.mPC.getUnsignedValue();
 		final int lOffset = this.getImmediateBits2sComp(9);
 		this.mMemory[lCurrentPC + lOffset] = this.mRegisters[lSrcReg].copy();
 	}
@@ -258,7 +254,8 @@ public class Computer {
 	 */
 	public void executeNot() {
 		final int lDestReg = this.getFirstRegOfIRBitString();
-		final int lResult = ~(this.mRegisters[lDestReg].get2sCompValue()); // bitwise NOT
+		final int lSrcReg = this.mIR.substring(7, 3).getUnsignedValue();
+		final int lResult = ~(this.mRegisters[lSrcReg].get2sCompValue()); // bitwise NOT
 		this.mRegisters[lDestReg].set2sCompValue(lResult);
 		this.setCC(lResult);
 	}
@@ -273,7 +270,10 @@ public class Computer {
 	 */
 	public boolean executeTrap() {
 		final int lHaltCode = 0x25;
-		return this.mIR.substring(9, 7).getUnsignedValue() == lHaltCode;
+		final int lOutCode = 0x21 ;
+		final int lTrapVector = this.mIR.substring(9, 7).getUnsignedValue();
+		if (lTrapVector == lOutCode) System.out.print((char) this.mRegisters[0].get2sCompValue());
+		return lTrapVector == lHaltCode;
 	}
 
 	/**
@@ -350,7 +350,7 @@ public class Computer {
 	}
 
 	private void setCC(final int pValue) {
-		this.mCC.setUnsignedValue(0);
+		this.mCC.setBits(new char[] {'0', '0', '0'});
 		// character array implementation unprotected
 		if (pValue < 0) 		this.mCC.getBits()[0] = '1';
 		else if (pValue > 0) 	this.mCC.getBits()[2] = '1';
