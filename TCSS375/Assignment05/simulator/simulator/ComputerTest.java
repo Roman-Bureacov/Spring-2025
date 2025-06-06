@@ -446,4 +446,35 @@ class ComputerTest {
 		this.myComputer.loadMachineCode(pMachineCode);
 		this.myComputer.execute();
 	}
+
+	/**
+	 * test adding zero by adding two zeroed registers together and checks the condition code
+	 */
+	@Test
+	void testExecuteAdd0Plus0Registers() {
+		String[] lAddtest = {
+				"0101000000100000", // AND R0 <- R0 and 0 (just to be safe)
+				"0001000000000000", // ADD R0 <- R0 + R0 (0 + 0)
+				HALT_CODE
+		};
+
+		this.run(lAddtest);
+		this.compareConditionCodes("010".toCharArray());
+	}
+
+
+	/**
+	 * test adding zero by adding a zeroed register and immediate zero and checks the condition code
+	 */
+	@Test
+	void testExecuteAdd0Plus0Immediate() {
+		String[] lAddtest = {
+				"0101000000100000", // AND R0 <- R0 and 0 (just to be safe)
+				"0001000000100000", // ADD R0 <- R0 + 0 (0 + 0)
+				HALT_CODE
+		};
+
+		this.run(lAddtest);
+		this.compareConditionCodes("010".toCharArray());
+	}
 }
