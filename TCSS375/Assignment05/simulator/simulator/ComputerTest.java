@@ -5,6 +5,8 @@ package simulator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -149,7 +151,7 @@ class ComputerTest {
 				"0001001001100101", // ADD	R1 <- 5
 				"0001010010000001",	// ADD	R2 <- + R1
 				"0001000000111111", // ADD	R0 <- + #-1
-				"0000001111111101", // BR	p PC - 3
+				"0000001111111101", // BR	p PC + #-3
 				HALT_CODE
 		};
 
@@ -188,6 +190,52 @@ class ComputerTest {
 				this.myComputer.getRegisters()[1].get2sCompValue(),
 				"Register 1 did not load PC - 3"
 		);
+	}
+
+	/**
+	 * Tests if the load instruction correctly sets condition 001
+	 */
+	@Test
+	void testExecuteLoadCondition001() {
+		final String[] lLoadTest = {
+				"0010000000000001", // LD R0 <- PC + 1
+				HALT_CODE,
+				"0111111111111111", // BIG positive number
+		};
+
+		this.run(lLoadTest);
+		this.compareConditionCodes("001".toCharArray());
+	}
+
+	/**
+	 * Tests if the load instruction correctly sets condition 010
+	 */
+	@Test
+	void testExecuteLoadCondition010() {
+		final String[] lLoadTest = {
+				"0010000000000001", // LD R0 <- PC + 1
+				HALT_CODE,
+				"0000000000000000", // BIG ZERO
+		};
+
+		this.run(lLoadTest);
+		this.compareConditionCodes("010".toCharArray());
+	}
+
+
+	/**
+	 * Tests if the load instruction correctly sets condition 100
+	 */
+	@Test
+	void testExecuteLoadCondition100() {
+		final String[] lLoadTest = {
+				"0010000000000001", // LD R0 <- PC + 1
+				HALT_CODE,
+				"1000000000000000", // BIG negative number
+		};
+
+		this.run(lLoadTest);
+		this.compareConditionCodes("100".toCharArray());
 	}
 	
 	/**
@@ -232,11 +280,75 @@ class ComputerTest {
 		};
 
 		this.run(lAndTest);
-
 		assertEquals(
 				0b01110,
 				this.myComputer.getRegisters()[2].get2sCompValue(),
 				"R2 did not receive the anded product of R0 and R1"
+		);
+	}
+
+	/**
+	 * Test if the condition 010 is set for AND instruction
+	 */
+	@Test
+	void testExecuteAndConditionCode010() {
+		final String[] lAndTest = {
+				"0101000111100000", // AND R0 <- R7 AND 0
+				HALT_CODE
+		};
+
+		this.run(lAndTest);
+		this.compareConditionCodes("010".toCharArray());
+	}
+
+	/**
+	 * Test if the condition 100 is set for AND instruction.
+	 * <br>
+	 * Note that this test assumes that the test {@link ComputerTest#testExecuteAndConditionCode010()}
+	 * has passed.
+	 */
+	@Test
+	void testExecuteAndConditionCode100() {
+		final String[] lAndTest = {
+				"0001000000111111", // ADD R0 <- R0 + #-1
+				"0101001001100000", // AND R1, R1 <- 0 (reset CC)
+				"0001000000111111", // AND R0 <- R0 and -1
+				HALT_CODE
+		};
+
+		this.run(lAndTest);
+		this.compareConditionCodes("100".toCharArray());
+	}
+
+	/**
+	 * Test if the condition 001 is set for AND instruction
+	 * <br>
+	 * Note that this test assumes that the test {@link ComputerTest#testExecuteAndConditionCode010()}
+	 * has passed.
+	 */
+	@Test
+	void testExecuteAndConditionCode001() {
+		final String[] lAndTest = {
+				"0001000000100001", // ADD R0 <- R0 + 1
+				HALT_CODE
+		};
+
+		this.run(lAndTest);
+		this.compareConditionCodes("001".toCharArray());
+	}
+
+	/**
+	 * Helper method to assert equals condition codes with the computer condition code
+	 */
+	void compareConditionCodes(final char[] pExpected) {
+		final char[] lActual = this.myComputer.getCC().getBits();
+		assertArrayEquals(
+				pExpected,
+				lActual,
+				"condition code was set incorrectly"
+						+ "\nExpected: %s\nActual: %s".formatted(
+						Arrays.toString(pExpected), Arrays.toString(lActual)
+				)
 		);
 	}
 
@@ -287,9 +399,7 @@ class ComputerTest {
 		assertEquals(4, myComputer.getRegisters()[0].get2sCompValue());
 		
 		// Check that CC was set correctly
-		BitString expectedCC = new BitString();
-		expectedCC.setBits("001".toCharArray());
-		assertEquals(expectedCC.get2sCompValue(), myComputer.getCC().get2sCompValue());
+		this.compareConditionCodes("001".toCharArray());
 	}
 	
 	/**
@@ -309,9 +419,7 @@ class ComputerTest {
 		assertEquals(5, myComputer.getRegisters()[0].get2sCompValue());
 		
 		// Check that CC was set correctly
-		BitString expectedCC = new BitString();
-		expectedCC.setBits("001".toCharArray());
-		assertEquals(expectedCC.get2sCompValue(), myComputer.getCC().get2sCompValue());
+		this.compareConditionCodes("001".toCharArray());
 	}
 	
 	/**
@@ -331,9 +439,7 @@ class ComputerTest {
 		assertEquals(-1, myComputer.getRegisters()[0].get2sCompValue());
 		
 		// Check that CC was set correctly
-		BitString expectedCC = new BitString();
-		expectedCC.setBits("100".toCharArray());
-		assertEquals(expectedCC.get2sCompValue(), myComputer.getCC().get2sCompValue());
+		this.compareConditionCodes("100".toCharArray());
 	}
 
 	private void run(final String... pMachineCode) {

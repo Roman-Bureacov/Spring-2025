@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * The simulator.Computer class is composed of registers, memory, PC, IR, and CC.
  * The simulator.Computer can execute a program based on the the instructions in memory.
- *  
+ *
  * @author mmuppa
  * @author acfowler
  * @author Roman Bureacov
@@ -33,7 +33,7 @@ public class Computer {
 		mIR.setUnsignedValue(0);
 		mCC = new BitString();
 		mCC.setBits(new char[] { '0', '0', '0' });
-		
+
 		mRegisters = new BitString[MAX_REGISTERS];
 		for (int i = 0; i < MAX_REGISTERS; i++) {
 			mRegisters[i] = new BitString();
@@ -46,10 +46,10 @@ public class Computer {
 			mMemory[i].setUnsignedValue(0);
 		}
 	}
-	
+
 	// The public accessor methods shown below are useful for unit testing.
 	// Do NOT add public mutator methods (setters)!
-	
+
 	/**
 	 * @return the registers
 	 */
@@ -84,7 +84,7 @@ public class Computer {
 	public BitString getCC() {
 		return mCC.copy();
 	}
-	
+
 	/**
 	 * Safely copies a simulator.BitString array.
 	 * @param theArray the array to copy.
@@ -97,7 +97,7 @@ public class Computer {
 	}
 
 	/**
-	 * Loads a 16 bit word into memory at the given address. 
+	 * Loads a 16 bit word into memory at the given address.
 	 * @param address memory address
 	 * @param word data or instruction or address to be loaded into memory
 	 */
@@ -107,7 +107,7 @@ public class Computer {
 		}
 		mMemory[address] = word;
 	}
-	
+
 	/**
 	 * Loads a machine code program, as Strings.
 	 * @param theWords the Strings that contain the instructions or data.
@@ -125,11 +125,11 @@ public class Computer {
 
 	// The next 6 methods are used to execute the required instructions:
 	// BR, ADD, LD, ST, AND, NOT, TRAP
-	
+
 	/**
 	 * op   nzp pc9offset
 	 * 0000 000 000000000
-	 * 
+	 *
 	 * The condition codes specified by bits [11:9] are tested.
 	 * If bit [11] is 1, N is tested; if bit [11] is 0, N is not tested.
 	 * If bit [10] is 1, Z is tested, etc.
@@ -148,16 +148,16 @@ public class Computer {
 			this.mPC.setUnsignedValue(lCurrentPC + lOffset);
 		}
 	}
-	
+
 	/**
 	 * op   dr  sr1      sr2
 	 * 0001 000 000 0 00 000
-	 * 
+	 *
 	 * OR
-	 * 
+	 *
 	 * op   dr  sr1   imm5
 	 * 0001 000 000 1 00000
-	 * 
+	 *
 	 * If bit [5] is 0, the second source operand is obtained from SR2.
 	 * If bit [5] is 1, the second source operand is obtained by sign-extending the imm5 field to 16 bits.
 	 * In both cases, the second source operand is added to the contents of SR1 and the
@@ -183,7 +183,7 @@ public class Computer {
 
 		this.setCC(lResult);
 	}
-	
+
 	/**
 	 * Performs the load operation by placing the data from PC
 	 * + PC offset9 bits [8:0]
@@ -198,7 +198,7 @@ public class Computer {
 		this.mRegisters[lDestReg] = lMemory;
 		this.setCC(lMemory);
 	}
-	
+
 	/**
 	 * Store the contents of the register specified by SR
 	 * in the memory location whose address is computed by sign-extending bits [8:0] to 16 bits
@@ -210,16 +210,16 @@ public class Computer {
 		final int lOffset = this.getImmediateBits2sComp(9);
 		this.mMemory[lCurrentPC + lOffset] = this.mRegisters[lSrcReg].copy();
 	}
-	
+
 	/**
 	 * op   dr  sr1      sr2
 	 * 0101 000 000 0 00 000
-	 * 
+	 *
 	 * OR
-	 * 
+	 *
 	 * op   dr  sr1   imm5
 	 * 0101 000 000 1 00000
-	 * 
+	 *
 	 * If bit [5] is 0, the second source operand is obtained from SR2.
 	 * If bit [5] is 1, the second source operand is obtained by sign-extending the imm5 field to 16 bits.
 	 * In either case, the second source operand and the contents of SR1 are bitwise ANDed
@@ -248,7 +248,7 @@ public class Computer {
 	}
 
 	/**
-	 * Performs not operation by using the data from the source register (bits[8:6]) 
+	 * Performs not operation by using the data from the source register (bits[8:6])
 	 * and inverting and storing in the destination register (bits[11:9]).
 	 * Then sets CC.
 	 */
@@ -259,13 +259,13 @@ public class Computer {
 		this.mRegisters[lDestReg].set2sCompValue(lResult);
 		this.setCC(lResult);
 	}
-	
+
 	/**
 	 * Executes the trap operation by checking the vector (bits [7:0]
-	 * 
+	 *
 	 * vector x21 - OUT
 	 * vector x25 - HALT
-	 * 
+	 *
 	 * @return true if this Trap is a HALT command; false otherwise.
 	 */
 	public boolean executeTrap() {
@@ -276,9 +276,10 @@ public class Computer {
 		return lTrapVector == lHaltCode;
 	}
 
+
 	/**
-	 * This method will execute all the instructions starting at address 0 
-	 * until a HALT instruction is encountered. 
+	 * This method will execute all the instructions starting at address 0
+	 * until a HALT instruction is encountered.
 	 */
 	public void execute() {
 		BitString lOpCodeBits;
@@ -291,7 +292,7 @@ public class Computer {
 			// increment the PC
 			this.mPC.addOne();
 
-			// Decode the instruction's first 4 bits 
+			// Decode the instruction's first 4 bits
 			// to figure out the opcode
 			lOpCodeBits = this.mIR.substring(0, 4);
 			lOpCode = lOpCodeBits.getUnsignedValue();
@@ -350,15 +351,17 @@ public class Computer {
 	}
 
 	private void setCC(final int pValue) {
-		this.mCC.setBits(new char[] {'0', '0', '0'});
+		final char[] lNewCC = new char[] {'0', '0', '0'};
 		// character array implementation unprotected
-		if (pValue < 0) 		this.mCC.getBits()[0] = '1';
-		else if (pValue > 0) 	this.mCC.getBits()[2] = '1';
-		else 					this.mCC.getBits()[1] = '1';
+		if (pValue < 0) 		lNewCC[0] = '1';
+		else if (pValue > 0) 	lNewCC[2] = '1';
+		else 					lNewCC[1] = '1';
+
+		this.mCC.setBits(lNewCC);
 	}
 
 	private void setCC(final BitString pBits) {
-		this.setCC(pBits.getUnsignedValue());
+		this.setCC(pBits.get2sCompValue());
 	}
 
 	private int getFirstRegOfIRBitString() {
